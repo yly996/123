@@ -1,0 +1,49 @@
+import pandas as pd  
+from sklearn.model_selection import train_test_split  
+from sklearn.preprocessing import StandardScaler  
+from sklearn.neighbors import KNeighborsClassifier  
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix  
+  
+# 数据集路径  
+data_path = 'E:\\下载专用\\iris (1).data'  
+  
+# 加载数据集  
+# 假设数据集没有列名，我们可以手动添加  
+column_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species']  
+data = pd.read_csv(data_path, header=None, names=column_names)  
+  
+# 特征和标签  
+X = data.iloc[:, :-1]  # 所有行，除了最后一列（即特征）  
+y = data.iloc[:, -1]   # 所有行，最后一列（即标签）  
+  
+# 将标签转换为分类数值  
+y = y.astype('category').cat.codes  
+  
+# 将数据集拆分为训练集和测试集  
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)  
+  
+# 特征标准化  
+scaler = StandardScaler()  
+X_train = scaler.fit_transform(X_train)  
+X_test = scaler.transform(X_test)  
+  
+# 创建KNN分类器  
+knn = KNeighborsClassifier(n_neighbors=3)  # 这里我们选择k=3，可以根据需要调整  
+  
+# 训练分类器  
+knn.fit(X_train, y_train)  
+  
+# 进行预测  
+y_pred = knn.predict(X_test)  
+  
+# 评估模型  
+accuracy = accuracy_score(y_test, y_pred)  
+print(f'Accuracy: {accuracy:.2f}')  
+  
+# 分类报告  
+print('Classification Report:')  
+print(classification_report(y_test, y_pred, target_names=data['species'].astype('category').cat.categories))  
+  
+# 混淆矩阵  
+print('Confusion Matrix:')  
+print(confusion_matrix(y_test, y_pred))
